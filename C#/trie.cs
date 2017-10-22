@@ -1,12 +1,14 @@
 public class TrieNode{
     public Hashtable map;
     public bool endOfWord;
-    public int count;
+    public int pref_count;
+    public int word_count;
     
     public TrieNode(){
     map = new Hashtable();
     endOfWord = true;
-    count = 0;        
+    pref_count = 0; 
+    word_count = 0;
     }
 
 }
@@ -26,7 +28,11 @@ public class Trie{
     public void add(string s, int index, TrieNode curr){
        
         int len = s.Length;
-        if(index == len) return;
+        if(index == len) {
+            curr.word_count++;
+            curr.endOfWord = true;
+            return;
+        }
         
         char c = s[index];
         TrieNode node;
@@ -43,7 +49,7 @@ public class Trie{
             node = (TrieNode)curr.map[c];
         }
         
-        node.count++;
+        node.pref_count++;
         
         add(s, index+1, node);
     }
@@ -90,7 +96,7 @@ public class Trie{
                
     public int findcount_prefix(string s, int index, TrieNode curr){
         if(s.Length == index){
-            return curr.count;
+            return curr.pref_count;
         }
         TrieNode node;
         char c = s[index];
@@ -101,6 +107,34 @@ public class Trie{
         
         node = (TrieNode)curr.map[c]; 
         return(findcount_prefix(s, index+1, node));
+        
+    }
+
+    
+    public int findcount_word(string s){
+        if(s.Length == 0) return 0;
+        
+        return(findcount_word(s, 0, this.root));
+    }
+    
+    public int findcount_word(string s, int index, TrieNode curr){
+        if(s.Length == index){
+            if(curr.endOfWord == true)
+                return curr.word_count;
+            else
+                return 0;
+        }
+        
+        TrieNode node;
+        char c = s[index];
+        
+        if(!curr.map.Contains(c)){
+            //doesn't contain the character c
+            return 0;
+        }
+        
+        node = (TrieNode)curr.map[c]; 
+        return(findcount_word(s, index+1, node));
         
     }
 }
